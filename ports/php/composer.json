@@ -1,0 +1,33 @@
+{
+  "name": "codinglombok/lomboksimhash",
+  "description": "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling.",
+  "type": "library",
+  "license": "Apache-2.0",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "CodingLombok",
+      "email": "codinglombok@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.1",
+    "ext-gmp": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "CodingLombok\\LombokSimHash\\": "src/"
+    }
+  },
+  "homepage": "https://github.com/codinglombok/LombokSimHash",
+  "keywords": [
+    "simhash",
+    "minhash",
+    "lsh",
+    "deduplication",
+    "hashing",
+    "locality-sensitive-hashing",
+    "near-duplicate",
+    "lombok"
+  ]
+}

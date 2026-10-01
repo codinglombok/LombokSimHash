@@ -1,0 +1,27 @@
+[package]
+name = "lomboksimhash"
+version = "0.1.0"
+edition = "2021"
+authors = ["CodingLombok <codinglombok@gmail.com>"]
+description = "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling."
+license = "Apache-2.0"
+repository = "https://github.com/codinglombok/LombokSimHash"
+homepage = "https://github.com/codinglombok/LombokSimHash"
+documentation = "https://docs.rs/lomboksimhash"
+keywords = ["simhash", "minhash", "lsh", "deduplication", "hashing"]
+categories = ["algorithms", "text-processing", "no-std"]
+readme = "README.md"
+
+[features]
+default = ["std"]
+std = []
+
+[[bin]]
+name = "lomboksimhash-cli"
+path = "src/main.rs"
+required-features = ["std"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

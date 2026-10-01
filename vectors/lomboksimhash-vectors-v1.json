@@ -1,0 +1,147 @@
+{
+  "version": "1.0.0",
+  "library": "LombokSimHash",
+  "description": "Cross-language test vectors for deterministic verification",
+  "vectors": {
+    "sha256": [
+      {
+        "id": "sha256-empty",
+        "input": "",
+        "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "sha256-hello",
+        "input": "hello",
+        "expected": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+      },
+      {
+        "id": "sha256-fox",
+        "input": "the quick brown fox jumps over the lazy dog",
+        "expected": "05c6e08f1d9fdafa03147fcb8f82f124c76d2f70e3d989dc8aadb5e7d7450bec"
+      },
+      {
+        "id": "sha256-abc",
+        "input": "abc",
+        "expected": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+      }
+    ],
+    "fnv1a64": [
+      {
+        "id": "fnv1a-empty",
+        "input": "",
+        "expected_hex": "cbf29ce484222325"
+      },
+      {
+        "id": "fnv1a-hello",
+        "input": "hello",
+        "expected_hex": "a430d84680aabd0b"
+      },
+      {
+        "id": "fnv1a-fox",
+        "input": "the",
+        "expected_hex": "56f5c9194461d57c"
+      }
+    ],
+    "shingle": [
+      {
+        "id": "shingle-char-3",
+        "input": "abcde",
+        "mode": "character",
+        "n": 3,
+        "expected": ["abc", "bcd", "cde"]
+      },
+      {
+        "id": "shingle-word-2",
+        "input": "the quick brown fox",
+        "mode": "word",
+        "n": 2,
+        "expected": ["brown fox", "quick brown", "the quick"]
+      },
+      {
+        "id": "shingle-char-2",
+        "input": "hello",
+        "mode": "character",
+        "n": 2,
+        "expected": ["el", "he", "ll", "lo"]
+      },
+      {
+        "id": "shingle-word-3",
+        "input": "a b c d",
+        "mode": "word",
+        "n": 3,
+        "expected": ["a b c", "b c d"]
+      },
+      {
+        "id": "shingle-char-1",
+        "input": "abc",
+        "mode": "character",
+        "n": 1,
+        "expected": ["a", "b", "c"]
+      }
+    ],
+    "simhash64": [
+      {
+        "id": "simhash64-fox",
+        "input": "the quick brown fox jumps over the lazy dog",
+        "expected_hex": "cab7991c5475edee"
+      },
+      {
+        "id": "simhash64-cat",
+        "input": "the quick brown cat jumps over the lazy dog",
+        "expected_hex": "c2e7991c1465e56f"
+      },
+      {
+        "id": "simhash64-fox-cat-hamming",
+        "text_a": "the quick brown fox jumps over the lazy dog",
+        "text_b": "the quick brown cat jumps over the lazy dog",
+        "hash_a_hex": "cab7991c5475edee",
+        "hash_b_hex": "c2e7991c1465e56f",
+        "expected_hamming": 8
+      }
+    ],
+    "minhash": [
+      {
+        "id": "minhash-identical",
+        "description": "Same token sets must yield Jaccard = 1.0",
+        "set_a": ["the", "quick", "brown", "fox"],
+        "set_b": ["the", "quick", "brown", "fox"],
+        "num_perm": 128,
+        "expected_jaccard": 1.0
+      },
+      {
+        "id": "minhash-disjoint",
+        "description": "Disjoint sets must yield Jaccard < 0.2",
+        "set_a": ["alpha", "beta", "gamma"],
+        "set_b": ["delta", "epsilon", "zeta"],
+        "num_perm": 128,
+        "expected_jaccard_max": 0.2
+      },
+      {
+        "id": "minhash-overlapping",
+        "description": "50% overlap, actual Jaccard = 2/6 ≈ 0.333",
+        "set_a": ["a", "b", "c", "d"],
+        "set_b": ["c", "d", "e", "f"],
+        "num_perm": 128,
+        "expected_jaccard_approx": 0.333,
+        "tolerance": 0.15
+      }
+    ],
+    "lsh": [
+      {
+        "id": "lsh-threshold-20-5",
+        "bands": 20,
+        "rows": 5,
+        "expected_threshold_approx": 0.5493,
+        "tolerance": 0.01
+      }
+    ],
+    "constants": {
+      "fnv64_offset": "0xcbf29ce484222325",
+      "fnv64_prime": "0x100000001b3",
+      "lcg_seed": "0x517cc1b727220a95",
+      "lcg_multiplier": "6364136223846793005",
+      "lcg_increment": "1442695040888963407",
+      "mersenne_61": "2305843009213693951"
+    }
+  }
+}

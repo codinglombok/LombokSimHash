@@ -1,0 +1,51 @@
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Node / TypeScript
+node_modules/
+ports/typescript/dist/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+.pnp.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+*.egg
+
+# Go
+*.exe
+*.test
+*.out
+/vendor/
+
+# PHP
+/ports/php/vendor/
+composer.lock
+.phpunit.result.cache
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+*.log
+tmp/
+.cache/
+/doc
+/map
