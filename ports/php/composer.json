@@ -3,7 +3,6 @@
   "description": "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling.",
   "type": "library",
   "license": "Apache-2.0",
-  "version": "0.1.0",
   "authors": [
     {
       "name": "CodingLombok",

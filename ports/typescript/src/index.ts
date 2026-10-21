@@ -70,7 +70,7 @@ function sha256Compress(state: number[], block: Uint8Array): void {
     w[i] = (w[i - 16]! + s0 + w[i - 7]! + s1) >>> 0;
   }
 
-  let [a, b, c, d, e, f, g, h] = state;
+  let [a, b, c, d, e, f, g, h] = [...state] as number[];
 
   for (let i = 0; i < 64; i++) {
     const s1 = rotr32(e, 6) ^ rotr32(e, 11) ^ rotr32(e, 25);

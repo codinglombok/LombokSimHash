@@ -3,25 +3,27 @@
 > Near-duplicate document detection for RAG pipelines — SimHash, MinHash, LSH, SHA-256, and shingling.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![Wave 1](https://img.shields.io/badge/Wave-1_(zero--dep)-green.svg)](masterplan_repo.md)
+[![CI](https://github.com/codinglombok/LombokSimHash/actions/workflows/ci.yml/badge.svg)](https://github.com/codinglombok/LombokSimHash/actions/workflows/ci.yml)
 
 **LombokSimHash** is library #02 of [LombokRAGFrameworks](https://github.com/codinglombok/LombokRAGFrameworks) —
 a Tier 4 Hub in the Lombok Ecosystem. It identifies redundant documents *before* they
 enter your vector store, preventing wasteful indexing of duplicate content.
 
-- **Zero dependencies** — pure implementation in every language
-- **no_std compatible** — Rust core runs in embedded/WASM environments
-- **Deterministic across languages** — identical hash values in Rust, TypeScript, Python, Go, and PHP
-- **Streaming API** — process large documents chunk-by-chunk
+- **Zero runtime dependencies** — pure implementation in every language (dev-only test tooling allowed)
+- **no_std compatible** — Rust core runs in embedded/WASM environments (`core` + `alloc` only)
+- **Deterministic across languages** — bit-identical hash values in Rust, TypeScript, Python, Go, and PHP,
+  verified against one shared vector file (`vectors/lomboksimhash-vectors-v2.json`)
+- **Streaming API** — process large documents chunk-by-chunk (`Sha256State`, `Shingler`)
+- **Fail-closed errors** — uniform `[KODE] pesan` error contract across all ports
 
 ## Installation
 
 | Language | Command |
 |----------|---------|
 | Rust | `cargo add lomboksimhash` |
-| TypeScript | `npm install lomboksimhash` |
+| TypeScript | `npm install lomboksimhash` (primary npm publication of the ecosystem) |
 | Python | `pip install lomboksimhash` |
-| Go | `go get github.com/codinglombok/LombokSimHash` |
+| Go | `go get github.com/codinglombok/LombokSimHash/ports/go` |
 | PHP | `composer require codinglombok/lomboksimhash` |
 
 ## What's inside
@@ -85,7 +87,7 @@ print(lsh.query(mh.signature))            # ['doc1']
 ### Go
 
 ```go
-import "github.com/codinglombok/LombokSimHash"
+import "github.com/codinglombok/LombokSimHash/ports/go"
 
 a := lomboksimhash.SimHash64Text("the quick brown fox jumps over the lazy dog")
 b := lomboksimhash.SimHash64Text("the quick brown cat jumps over the lazy dog")
@@ -135,21 +137,40 @@ Document ──┬─→ SHA-256 ──────────→ exact duplica
 
 ## Cross-language determinism
 
-All ports produce **byte-identical** hash values. Verified against
-[`vectors/lomboksimhash-vectors-v1.json`](vectors/lomboksimhash-vectors-v1.json):
+All ports produce **bit-identical** hash values, verified against the shared,
+deterministically generated vector file
+[`vectors/lomboksimhash-vectors-v2.json`](vectors/lomboksimhash-vectors-v2.json)
+(75 cases: SHA-256, FNV-1a, shingles, SimHash 64/128, exact MinHash signatures,
+LSH band keys and index scenarios). The vectors are produced by
+`vectors/generate_vectors.py` — never hand-edited; CI re-verifies determinism.
+
+Guaranteed by fixed constants: FNV-1a (`0xcbf29ce484222325` / `0x100000001b3`),
+LCG seed `0x517cc1b727220a95`, and Mersenne prime `2^61 - 1`.
 
 | Input | SHA-256 | SimHash64 |
 |-------|---------|-----------|
 | `"the quick brown fox jumps over the lazy dog"` | `05c6e08f…7450bec` | `cab7991c5475edee` |
 | `"the quick brown cat jumps over the lazy dog"` | — | `c2e7991c1465e56f` |
 
-Guaranteed by fixed constants: FNV-1a (`0xcbf29ce484222325` / `0x100000001b3`),
-LCG seed `0x517cc1b727220a95`, and Mersenne prime `2^61 - 1`.
+## Error contract
+
+All ports fail closed with identical byte-for-byte messages:
+
+| Kode | Pesan |
+|------|-------|
+| `[ERR_SHINGLE_N]` | shingle size must be > 0 |
+| `[ERR_MINHASH_PERM]` | num_perm must be > 0 |
+| `[ERR_LSH_CONFIG]` | bands and rows must be > 0 |
+| `[ERR_SIG_LEN]` | signature length must be bands * rows = {n} |
+| `[ERR_JACCARD_LEN]` | signatures must have same length |
+| `[ERR_JACCARD_EMPTY]` | signatures must not be empty |
 
 ## Documentation
 
-
 - [Changelog](changelog.md) — version history
+- [TypeScript port](ports/typescript/README.md) · [Python port](ports/python/README.md) · [Go port](ports/go/README.md) · [PHP port](ports/php/README.md)
+- Internal design docs (SPEC, Architecture, Masterplan, …) live in `docs/` per the
+  Lombok Ecosystem documentation pack.
 
 ## License
 
