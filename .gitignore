@@ -56,3 +56,6 @@ Stucture Repo_*.md
 TECH DEBT_*.md
 Architecture_*.md
 Masterplan_*.md
+
+# Vitest coverage output
+coverage/
