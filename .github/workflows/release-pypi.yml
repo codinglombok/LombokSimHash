@@ -9,6 +9,7 @@ jobs:
   publish:
     name: Publish Python package
     runs-on: ubuntu-latest
+    if: ${{ hashFiles('ports/python/pyproject.toml') != '' }}
     defaults:
       run:
         working-directory: ports/python
@@ -20,12 +21,22 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run tests
-        run: python test_lomboksimhash.py
-      - name: Install build tooling
-        run: python -m pip install --upgrade build
-      - name: Build distribution
+      - name: Install (library + dev tools)
+        run: |
+          python -m pip install --upgrade pip build
+          pip install -e ".[dev]"
+      - name: Gates (ruff + mypy + tests incl. shared vectors)
+        run: |
+          ruff check src tests
+          mypy src
+          pytest tests/
+      - name: Build distribution (sdist + wheel)
         run: python -m build
+      - name: Smoke-test wheel
+        run: |
+          python -m venv /tmp/lsh-smoke
+          /tmp/lsh-smoke/bin/pip install --quiet dist/*.whl
+          /tmp/lsh-smoke/bin/python -c "from lomboksimhash import simhash64_text; assert f'{simhash64_text(chr(116)+chr(104)+chr(101)+chr(32)+chr(102)+chr(111)+chr(120)):016x}'.endswith('edee')"
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
