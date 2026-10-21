@@ -1,7 +1,7 @@
 //! LombokSimHash CLI tool.
 
-use lomboksimhash::{sha256, simhash64_text, hamming64};
 use lomboksimhash::sha256::to_hex;
+use lomboksimhash::{hamming64, sha256, simhash64_text};
 
 fn print_usage() {
     eprintln!("LombokSimHash CLI v0.1.0");
@@ -25,7 +25,7 @@ fn main() {
     match args[1].as_str() {
         "simhash" => {
             if args.len() < 3 {
-                eprintln!("Error: missing text argument");
+                eprintln!("[ERR_ARGS] missing text argument");
                 std::process::exit(1);
             }
             let text = &args[2];
@@ -34,7 +34,7 @@ fn main() {
         }
         "sha256" => {
             if args.len() < 3 {
-                eprintln!("Error: missing text argument");
+                eprintln!("[ERR_ARGS] missing text argument");
                 std::process::exit(1);
             }
             let text = &args[2];
@@ -43,7 +43,7 @@ fn main() {
         }
         "compare" => {
             if args.len() < 4 {
-                eprintln!("Error: need two text arguments");
+                eprintln!("[ERR_ARGS] need two text arguments");
                 std::process::exit(1);
             }
             let h1 = simhash64_text(&args[2]);
@@ -58,7 +58,7 @@ fn main() {
             print_usage();
         }
         cmd => {
-            eprintln!("Unknown command: {}", cmd);
+            eprintln!("[ERR_UNKNOWN_CMD] unknown command: {cmd}");
             print_usage();
             std::process::exit(1);
         }

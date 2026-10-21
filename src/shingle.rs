@@ -1,16 +1,16 @@
 //! Shingling — n-gram generation for document fingerprinting.
 //! Supports character and word modes with streaming API.
 
+use alloc::collections::BTreeSet;
 use alloc::string::String;
 use alloc::vec::Vec;
-use alloc::collections::BTreeSet;
 
 /// Shingle generation mode.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ShingleMode {
-    /// Character n-grams
+    /// Character n-grams (Unicode code points)
     Character,
-    /// Word n-grams
+    /// Word n-grams (SPEC tokenizer, joined with a single space)
     Word,
 }
 
@@ -23,8 +23,13 @@ pub struct Shingler {
 
 impl Shingler {
     /// Create a new shingler with the given mode and n-gram size.
+    ///
+    /// # Panics
+    /// Panics with `[ERR_SHINGLE_N]` when `n == 0`.
     pub fn new(mode: ShingleMode, n: usize) -> Self {
-        assert!(n > 0, "shingle size must be > 0");
+        if n == 0 {
+            panic!("[ERR_SHINGLE_N] shingle size must be > 0");
+        }
         Self {
             mode,
             n,
@@ -37,7 +42,7 @@ impl Shingler {
         self.buffer.push_str(text);
     }
 
-    /// Finish and return all unique shingles.
+    /// Finish and return all unique shingles (sorted by code point).
     pub fn finish(&self) -> BTreeSet<String> {
         match self.mode {
             ShingleMode::Character => self.char_shingles(),
@@ -48,6 +53,16 @@ impl Shingler {
     /// Return shingles as a sorted Vec.
     pub fn finish_vec(&self) -> Vec<String> {
         self.finish().into_iter().collect()
+    }
+
+    /// N-gram size.
+    pub fn n(&self) -> usize {
+        self.n
+    }
+
+    /// Mode.
+    pub fn mode(&self) -> ShingleMode {
+        self.mode
     }
 
     fn char_shingles(&self) -> BTreeSet<String> {
@@ -63,7 +78,7 @@ impl Shingler {
     }
 
     fn word_shingles(&self) -> BTreeSet<String> {
-        let words: Vec<&str> = self.buffer.split_whitespace().collect();
+        let words = crate::text::tokenize(&self.buffer);
         let mut set = BTreeSet::new();
         if words.len() >= self.n {
             for i in 0..=words.len() - self.n {
@@ -75,14 +90,20 @@ impl Shingler {
     }
 }
 
-/// Convenience: generate character shingles from text.
+/// Convenience: generate character shingles from text (code points).
+///
+/// # Panics
+/// Panics with `[ERR_SHINGLE_N]` when `n == 0`.
 pub fn char_shingles(text: &str, n: usize) -> Vec<String> {
     let mut s = Shingler::new(ShingleMode::Character, n);
     s.feed(text);
     s.finish_vec()
 }
 
-/// Convenience: generate word shingles from text.
+/// Convenience: generate word shingles from text (SPEC tokenizer).
+///
+/// # Panics
+/// Panics with `[ERR_SHINGLE_N]` when `n == 0`.
 pub fn word_shingles(text: &str, n: usize) -> Vec<String> {
     let mut s = Shingler::new(ShingleMode::Word, n);
     s.feed(text);
@@ -95,16 +116,13 @@ mod tests {
 
     #[test]
     fn test_char_shingles() {
-        let shingles = char_shingles("abcde", 3);
-        assert_eq!(shingles, vec!["abc", "bcd", "cde"]);
+        assert_eq!(char_shingles("abcde", 3), vec!["abc", "bcd", "cde"]);
     }
 
     #[test]
     fn test_word_shingles() {
         let shingles = word_shingles("the quick brown fox", 2);
-        assert!(shingles.contains(&String::from("the quick")));
-        assert!(shingles.contains(&String::from("quick brown")));
-        assert!(shingles.contains(&String::from("brown fox")));
+        assert_eq!(shingles, vec!["brown fox", "quick brown", "the quick"]);
     }
 
     #[test]
@@ -112,7 +130,18 @@ mod tests {
         let mut s = Shingler::new(ShingleMode::Character, 3);
         s.feed("abc");
         s.feed("de");
-        let shingles = s.finish_vec();
-        assert_eq!(shingles, vec!["abc", "bcd", "cde"]);
+        assert_eq!(s.finish_vec(), vec!["abc", "bcd", "cde"]);
+    }
+
+    #[test]
+    fn test_n_larger_than_input() {
+        assert!(char_shingles("ab", 5).is_empty());
+        assert!(word_shingles("a b", 4).is_empty());
+    }
+
+    #[test]
+    #[should_panic(expected = "[ERR_SHINGLE_N] shingle size must be > 0")]
+    fn test_zero_n_panics() {
+        let _ = Shingler::new(ShingleMode::Character, 0);
     }
 }
