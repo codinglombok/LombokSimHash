@@ -3,18 +3,27 @@
   "version": "0.1.0",
   "description": "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling.",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/cjs/index.cjs",
+  "types": "dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
-    "dist/",
-    "src/",
-    "LICENSE",
-    "README.md"
+    "dist/"
   ],
+  "sideEffects": false,
   "scripts": {
-    "build": "tsc",
-    "test": "node --loader ts-node/esm src/test.ts",
-    "crosscheck": "node --loader ts-node/esm src/crosscheck.ts"
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/postbuild.mjs",
+    "typecheck": "tsc -p tsconfig.esm.json --noEmit",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --coverage",
+    "crosscheck": "node --import tsx src/crosscheck.ts",
+    "prepack": "npm run build"
   },
   "keywords": [
     "simhash",
@@ -35,10 +44,12 @@
   },
   "homepage": "https://github.com/codinglombok/LombokSimHash",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
   }
 }
