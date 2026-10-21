@@ -78,10 +78,7 @@ final class LombokSimHash
     public static function charShingles(string $text, int $n): array
     {
         self::assertShingleN($n);
-        $chars = mb_str_split($text, 1, 'UTF-8');
-        if ($chars === false) {
-            $chars = [];
-        }
+        $chars = mb_str_split($text, 1, 'UTF-8') ?: [];
         $set = [];
         $count = count($chars);
         for ($i = 0; $i + $n <= $count; $i++) {
@@ -119,6 +116,8 @@ final class LombokSimHash
 
     /**
      * 64-bit SimHash from tokens.
+     *
+     * @param list<string> $tokens
      */
     public static function simhash64(array $tokens): \GMP
     {
@@ -154,6 +153,7 @@ final class LombokSimHash
     /**
      * 128-bit SimHash from tokens. Returns [hi, lo] as GMP values.
      *
+     * @param list<string> $tokens
      * @return array{\GMP, \GMP}
      */
     public static function simhash128(array $tokens): array
@@ -340,7 +340,7 @@ final class LombokSimHash
      *
      * @return list<string>
      */
-    private static function tokenize(string $text): array
+    public static function tokenize(string $text): array
     {
         $parts = preg_split(
             '/[\t\n\x0B\x0C\r \x{0085}\x{00A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}]+/u',

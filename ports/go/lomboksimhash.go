@@ -127,6 +127,17 @@ func FNV1a64(data []byte) uint64 {
 }
 
 // ============================================================
+// Tokenization — exact SPEC whitespace contract
+// ============================================================
+
+// Tokenize splits text on runs of the SPEC whitespace set (Unicode
+// White_Space property, 25 code points) and drops empty parts.
+// strings.Fields implements exactly that set.
+func Tokenize(text string) []string {
+	return strings.Fields(text)
+}
+
+// ============================================================
 // Shingling
 // ============================================================
 
@@ -196,6 +207,48 @@ func Hamming64(a, b uint64) int {
 	return bits.OnesCount64(a ^ b)
 }
 
+// SimHash128 computes 128-bit SimHash from tokens.
+// lo accumulates FNV1a64(utf8(token)) bits; hi accumulates
+// FNV1a64(utf8(token) || 0xFF) bits.
+func SimHash128(tokens []string) (hi, lo uint64) {
+	var v [128]int
+	for _, token := range tokens {
+		h1 := FNV1a64([]byte(token))
+		h2 := FNV1a64(append([]byte(token), 0xFF))
+		for i := 0; i < 64; i++ {
+			if (h1>>uint(i))&1 == 1 {
+				v[i]++
+			} else {
+				v[i]--
+			}
+			if (h2>>uint(i))&1 == 1 {
+				v[64+i]++
+			} else {
+				v[64+i]--
+			}
+		}
+	}
+	for i := 0; i < 64; i++ {
+		if v[i] > 0 {
+			lo |= 1 << uint(i)
+		}
+		if v[64+i] > 0 {
+			hi |= 1 << uint(i)
+		}
+	}
+	return hi, lo
+}
+
+// SimHash128Text tokenizes by the SPEC whitespace set and computes SimHash128.
+func SimHash128Text(text string) (hi, lo uint64) {
+	return SimHash128(Tokenize(text))
+}
+
+// Hamming128 returns the Hamming distance between two 128-bit (hi, lo) pairs.
+func Hamming128(aHi, aLo, bHi, bLo uint64) int {
+	return bits.OnesCount64(aHi^bHi) + bits.OnesCount64(aLo^bLo)
+}
+
 // ============================================================
 // MinHash
 // ============================================================
@@ -252,7 +305,12 @@ type MinHasher struct {
 }
 
 // NewMinHasher creates a MinHasher with numPerm permutations.
+//
+// It panics with [ERR_MINHASH_PERM] when numPerm == 0.
 func NewMinHasher(numPerm int) *MinHasher {
+	if numPerm < 1 {
+		panic("[ERR_MINHASH_PERM] num_perm must be > 0")
+	}
 	sig := make([]uint64, numPerm)
 	for i := range sig {
 		sig[i] = ^uint64(0)
@@ -283,9 +341,15 @@ func (m *MinHasher) AddTokens(tokens []string) {
 }
 
 // JaccardEstimate estimates Jaccard similarity between two signatures.
+//
+// It panics with [ERR_JACCARD_LEN] on length mismatch and
+// [ERR_JACCARD_EMPTY] on empty signatures.
 func JaccardEstimate(sigA, sigB []uint64) float64 {
 	if len(sigA) != len(sigB) {
-		panic("signatures must have same length")
+		panic("[ERR_JACCARD_LEN] signatures must have same length")
+	}
+	if len(sigA) == 0 {
+		panic("[ERR_JACCARD_EMPTY] signatures must not be empty")
 	}
 	matches := 0
 	for i := range sigA {
@@ -308,7 +372,12 @@ type LshIndex struct {
 }
 
 // NewLshIndex creates a new LSH index.
+//
+// It panics with [ERR_LSH_CONFIG] when bands == 0 or rows == 0.
 func NewLshIndex(bands, rows int) *LshIndex {
+	if bands < 1 || rows < 1 {
+		panic("[ERR_LSH_CONFIG] bands and rows must be > 0")
+	}
 	buckets := make([]map[uint64][]string, bands)
 	for i := range buckets {
 		buckets[i] = make(map[uint64][]string)
@@ -340,7 +409,10 @@ func bandHash(vals []uint64) uint64 {
 }
 
 // Insert adds a document's MinHash signature.
+//
+// It panics with [ERR_SIG_LEN] when the signature length is not bands*rows.
 func (l *LshIndex) Insert(docID string, sig []uint64) {
+	l.assertSigLen(sig)
 	for b := 0; b < l.Bands; b++ {
 		start := b * l.Rows
 		key := bandHash(sig[start : start+l.Rows])
@@ -348,8 +420,11 @@ func (l *LshIndex) Insert(docID string, sig []uint64) {
 	}
 }
 
-// Query returns candidate near-duplicates.
+// Query returns candidate near-duplicates, deduplicated and sorted ascending.
+//
+// It panics with [ERR_SIG_LEN] when the signature length is not bands*rows.
 func (l *LshIndex) Query(sig []uint64) []string {
+	l.assertSigLen(sig)
 	seen := make(map[string]struct{})
 	for b := 0; b < l.Bands; b++ {
 		start := b * l.Rows
@@ -366,8 +441,11 @@ func (l *LshIndex) Query(sig []uint64) []string {
 	return result
 }
 
-// Remove removes a document from the index.
+// Remove removes a document from every band bucket touched by the signature.
+//
+// It panics with [ERR_SIG_LEN] when the signature length is not bands*rows.
 func (l *LshIndex) Remove(docID string, sig []uint64) {
+	l.assertSigLen(sig)
 	for b := 0; b < l.Bands; b++ {
 		start := b * l.Rows
 		key := bandHash(sig[start : start+l.Rows])
@@ -379,5 +457,11 @@ func (l *LshIndex) Remove(docID string, sig []uint64) {
 			}
 		}
 		l.buckets[b][key] = filtered
+	}
+}
+
+func (l *LshIndex) assertSigLen(sig []uint64) {
+	if len(sig) != l.SignatureLen() {
+		panic(fmt.Sprintf("[ERR_SIG_LEN] signature length must be bands * rows = %d", l.SignatureLen()))
 	}
 }

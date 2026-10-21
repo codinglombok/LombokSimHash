@@ -1322,55 +1322,40 @@
           {
             "doc_id": "b_doc",
             "signature_hex": [
-              "00b1c4337261025d",
-              "076ccf116901c89b",
-              "08eef07468ceed0b",
-              "057d64ca7e174680",
-              "0ea7d7c1d50c7a35",
-              "0097d12000dd9642"
+              "0487e4b2e250de28",
+              "02d7c4e75e58ba7d",
+              "05dc48db2237fd32"
             ]
           },
           {
             "doc_id": "a_doc",
             "signature_hex": [
-              "00b1c4337261025d",
-              "076ccf116901c89b",
-              "08eef07468ceed0b",
-              "057d64ca7e174680",
-              "0ea7d7c1d50c7a35",
-              "0097d12000dd9642"
+              "0487e4b2e250de28",
+              "02d7c4e75e58ba7d",
+              "05dc48db2237fd32"
             ]
           },
           {
             "doc_id": "c_doc",
             "signature_hex": [
-              "00b1c4337261025d",
-              "076ccf116901c89b",
-              "08eef07468ceed0b",
-              "057d64ca7e174680",
-              "0ea7d7c1d50c7a35",
-              "0097d12000dd9642"
+              "0487e4b2e250de28",
+              "02d7c4e75e58ba7d",
+              "05dc48db2237fd32"
             ]
           },
           {
             "doc_id": "a_doc",
             "signature_hex": [
-              "00b1c4337261025d",
-              "076ccf116901c89b",
-              "08eef07468ceed0b",
-              "057d64ca7e174680",
-              "0ea7d7c1d50c7a35",
-              "0097d12000dd9642"
+              "0487e4b2e250de28",
+              "02d7c4e75e58ba7d",
+              "05dc48db2237fd32"
             ]
           }
         ],
         "query_hex": [
-          "00b1c4337261025d",
-          "076ccf116901c89b",
-          "08eef07468ceed0b",
-          "057d64ca7e174680",
-          "0ea7d7c1d50c7a35",
-          "0097d12000dd9642"
+          "0487e4b2e250de28",
+          "02d7c4e75e58ba7d",
+          "05dc48db2237fd32"
         ],
         "expected": [
           "a_doc",

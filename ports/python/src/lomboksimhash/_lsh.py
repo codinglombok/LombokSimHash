@@ -5,7 +5,7 @@ Behavior pinned by docs/SPEC_LombokSimHash_0.1.0.md.
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 from ._core import FNV64_OFFSET, FNV64_PRIME, MASK64
 
@@ -61,7 +61,9 @@ class LshIndex:
 
     def threshold(self) -> float:
         """Approximate Jaccard threshold (1/bands)^(1/rows). Informational."""
-        return (1.0 / self._bands) ** (1.0 / self._rows)
+        base = 1.0 / self._bands
+        expo = 1.0 / self._rows
+        return float(base ** expo)
 
     def insert(self, doc_id: str, signature: Sequence[int]) -> None:
         """Insert a document signature into every band."""

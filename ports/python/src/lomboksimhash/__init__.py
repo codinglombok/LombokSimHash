@@ -12,12 +12,12 @@ License: Apache-2.0
 
 from __future__ import annotations
 
-from ._core import MASK64, FNV64_OFFSET, FNV64_PRIME, WHITESPACE, fnv1a64, to_hex64, tokenize
-from .lsh import LshIndex, band_hash
-from .minhash import MinHasher, jaccard_estimate
-from .sha256 import Sha256State, sha256, to_hex
-from .shingle import Shingler, char_shingles, word_shingles
-from .simhash import hamming128, hamming64, simhash128, simhash128_text, simhash64, simhash64_text
+from ._core import FNV64_OFFSET, FNV64_PRIME, MASK64, WHITESPACE, fnv1a64, to_hex64, tokenize
+from ._lsh import LshIndex, band_hash
+from ._minhash import MinHasher, jaccard_estimate
+from ._sha256 import Sha256State, sha256, to_hex
+from ._shingle import Shingler, char_shingles, word_shingles
+from ._simhash import hamming64, hamming128, simhash64, simhash64_text, simhash128, simhash128_text
 
 __version__ = "0.1.0"
 
@@ -32,6 +32,7 @@ __all__ = [
     "Shingler",
     "band_hash",
     "char_shingles",
+    "word_shingles",
     "fnv1a64",
     "hamming128",
     "hamming64",

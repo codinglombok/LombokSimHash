@@ -5,7 +5,7 @@ Behavior pinned by docs/SPEC_LombokSimHash_0.1.0.md.
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 from ._core import fnv1a64, tokenize
 

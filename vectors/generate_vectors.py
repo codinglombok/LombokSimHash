@@ -177,14 +177,23 @@ def lsh_simulate(
     """Simulate the LSH contract; returns (query_result, after_remove)."""
     if bands < 1 or rows < 1:
         raise ValueError("[ERR_LSH_CONFIG] bands and rows must be > 0")
+    expected_len = bands * rows
     buckets: list[dict[int, list[str]]] = [{} for _ in range(bands)]
 
+    def assert_len(sig: list[int]) -> None:
+        if len(sig) != expected_len:
+            raise ValueError(
+                f"[ERR_SIG_LEN] signature length must be bands * rows = {expected_len}"
+            )
+
     def insert(doc_id: str, sig: list[int]) -> None:
+        assert_len(sig)
         for b in range(bands):
             key = band_hash(sig[b * rows:(b + 1) * rows])
             buckets[b].setdefault(key, []).append(doc_id)
 
     def query(sig: list[int]) -> list[str]:
+        assert_len(sig)
         cand: set[str] = set()
         for b in range(bands):
             key = band_hash(sig[b * rows:(b + 1) * rows])
@@ -410,6 +419,7 @@ def build_lsh_index() -> list[dict]:
     fox_sig100 = minhash(FOX.split(), 100)
     hello_sig100 = minhash(["hello", "world"], 100)
     uni_sig = minhash(["你好", "世界", "alpha"], 6)
+    sig3 = minhash(["x", "yy", "zzz"], 3)
 
     inserts_and_queries = [
         {
@@ -438,12 +448,12 @@ def build_lsh_index() -> list[dict]:
             "bands": 3,
             "rows": 1,
             "inserts": [
-                {"doc_id": "b_doc", "signature_hex": [h64(v) for v in uni_sig]},
-                {"doc_id": "a_doc", "signature_hex": [h64(v) for v in uni_sig]},
-                {"doc_id": "c_doc", "signature_hex": [h64(v) for v in uni_sig]},
-                {"doc_id": "a_doc", "signature_hex": [h64(v) for v in uni_sig]},
+                {"doc_id": "b_doc", "signature_hex": [h64(v) for v in sig3]},
+                {"doc_id": "a_doc", "signature_hex": [h64(v) for v in sig3]},
+                {"doc_id": "c_doc", "signature_hex": [h64(v) for v in sig3]},
+                {"doc_id": "a_doc", "signature_hex": [h64(v) for v in sig3]},
             ],
-            "query_hex": [h64(v) for v in uni_sig],
+            "query_hex": [h64(v) for v in sig3],
         },
         {
             "id": "lsh-index-unicode-ids",

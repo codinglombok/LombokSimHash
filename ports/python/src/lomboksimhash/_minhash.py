@@ -5,7 +5,7 @@ Behavior pinned by docs/SPEC_LombokSimHash_0.1.0.md.
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 from ._core import MASK64, fnv1a64
 
@@ -26,7 +26,7 @@ def _generate_hash_params(num_perm: int) -> list[tuple[int, int]]:
     for _ in range(num_perm):
         state = (state * LCG_MUL + LCG_INC) & MASK64
         a = state % MERSENNE_61
-        if a == 0:
+        if a == 0:  # pragma: no cover — defensive; LCG never yields a multiple of p
             a = 1
         state = (state * LCG_MUL + LCG_INC) & MASK64
         b = state % MERSENNE_61
@@ -59,8 +59,7 @@ class MinHasher:
         for i in range(self._num_perm):
             a, b = self._params[i]
             val = _universal_hash(a, b, h)
-            if val < self.signature[i]:
-                self.signature[i] = val
+            self.signature[i] = min(self.signature[i], val)
 
     def add_tokens(self, tokens: Sequence[str]) -> None:
         """Fold a sequence of tokens into the signature (order-independent)."""
@@ -74,5 +73,5 @@ def jaccard_estimate(sig_a: Sequence[int], sig_b: Sequence[int]) -> float:
         raise ValueError("[ERR_JACCARD_LEN] signatures must have same length")
     if len(sig_a) == 0:
         raise ValueError("[ERR_JACCARD_EMPTY] signatures must not be empty")
-    matches = sum(1 for a, b in zip(sig_a, sig_b) if a == b)
+    matches = sum(1 for a, b in zip(sig_a, sig_b, strict=False) if a == b)
     return matches / len(sig_a)

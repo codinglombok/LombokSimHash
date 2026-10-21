@@ -63,7 +63,7 @@ final class LshIndex
     /**
      * Insert a document's MinHash signature into the index.
      *
-     * @param list<\GMP|string|int> $signature
+     * @param list<\GMP> $signature
      */
     public function insert(string $docId, array $signature): void
     {
@@ -79,7 +79,7 @@ final class LshIndex
     /**
      * Query candidate near-duplicates. Returns sorted, de-duplicated doc IDs.
      *
-     * @param list<\GMP|string|int> $signature
+     * @param list<\GMP> $signature
      * @return list<string>
      */
     public function query(array $signature): array
@@ -102,7 +102,7 @@ final class LshIndex
     /**
      * Remove all occurrences of a doc ID touched by this signature.
      *
-     * @param list<\GMP|string|int> $signature
+     * @param list<\GMP> $signature
      */
     public function remove(string $docId, array $signature): void
     {
@@ -121,7 +121,7 @@ final class LshIndex
     }
 
     /**
-     * @param list<\GMP|string|int> $signature
+     * @param list<\GMP> $signature
      */
     private function assertSignatureLen(array $signature): void
     {
@@ -136,17 +136,21 @@ final class LshIndex
     /**
      * FNV-1a 64 over the little-endian bytes of each band value.
      *
-     * @param list<\GMP|string|int> $bandValues
+     * @param list<\GMP> $bandValues
      */
     private function bandHash(array $bandValues): string
     {
         $h = gmp_init(self::FNV64_OFFSET);
         $prime = gmp_init(self::FNV64_PRIME);
         $mask = gmp_init(self::MASK64);
+        $ff = gmp_init(0xFF);
         foreach ($bandValues as $val) {
-            $v = gmp_init($val);
+            $v = $val;
             for ($byteIdx = 0; $byteIdx < 8; $byteIdx++) {
-                $byte = gmp_intval(gmp_and(gmp_shift($v, -$byteIdx * 8), gmp_init(0xFF)));
+                // exponent <= 56 < 64: gmp_pow is safe on every PHP build
+                // (gmp_pow throws for exponent >= 64 on some builds).
+                $shifted = gmp_div_q($v, gmp_pow(2, $byteIdx * 8));
+                $byte = gmp_intval(gmp_and($shifted, $ff));
                 $h = gmp_xor($h, gmp_init($byte));
                 $h = gmp_and(gmp_mul($h, $prime), $mask);
             }
