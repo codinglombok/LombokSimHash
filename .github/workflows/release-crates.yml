@@ -6,10 +6,22 @@ on:
       - "v*"
 
 jobs:
+  guard:
+    name: Manifest guard
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        if: ${{ hashFiles('Cargo.toml') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+
   publish:
     name: Publish Rust crate
+    needs: guard
+    if: needs.guard.outputs.ok == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('Cargo.toml') != '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust

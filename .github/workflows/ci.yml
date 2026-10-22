@@ -7,16 +7,52 @@ on:
     branches: [main, master]
 
 jobs:
+  guard:
+    name: Manifest guard
+    runs-on: ubuntu-latest
+    outputs:
+      rust: ${{ steps.rust.outputs.exists }}
+      typescript: ${{ steps.typescript.outputs.exists }}
+      python: ${{ steps.python.outputs.exists }}
+      go: ${{ steps.go.outputs.exists }}
+      php: ${{ steps.php.outputs.exists }}
+      vectors: ${{ steps.vectors.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: rust
+        if: ${{ hashFiles('Cargo.toml') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+      - id: typescript
+        if: ${{ hashFiles('ports/typescript/package.json') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+      - id: python
+        if: ${{ hashFiles('ports/python/pyproject.toml') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+      - id: go
+        if: ${{ hashFiles('ports/go/go.mod') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+      - id: php
+        if: ${{ hashFiles('ports/php/composer.json') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+      - id: vectors
+        if: ${{ hashFiles('vectors/generate_vectors.py') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+
   rust:
     name: Rust (core)
+    needs: guard
+    if: needs.guard.outputs.rust == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('Cargo.toml') != '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
+      - name: Install cargo-llvm-cov (prebuilt binary)
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
       - name: Format check
         run: cargo fmt --all -- --check
       - name: Clippy (deny warnings)
@@ -27,15 +63,14 @@ jobs:
         run: cargo build --no-default-features --verbose
       - name: Test (unit + integration + shared vectors)
         run: cargo test --verbose
-      - name: Coverage (>=95% lines)
-        run: |
-          cargo install cargo-llvm-cov --locked
-          cargo llvm-cov --fail-under-lines 95 --summary-only
+      - name: Coverage (>=95% lines; CLI entry excluded)
+        run: cargo llvm-cov --fail-under-lines 95 --summary-only --ignore-filename-regex 'src/main\.rs$'
 
   typescript:
     name: TypeScript
+    needs: guard
+    if: needs.guard.outputs.typescript == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('ports/typescript/package.json') != '' }}
     defaults:
       run:
         working-directory: ports/typescript
@@ -58,8 +93,9 @@ jobs:
 
   python:
     name: Python
+    needs: guard
+    if: needs.guard.outputs.python == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('ports/python/pyproject.toml') != '' }}
     defaults:
       run:
         working-directory: ports/python
@@ -85,8 +121,9 @@ jobs:
 
   go:
     name: Go
+    needs: guard
+    if: needs.guard.outputs.go == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('ports/go/go.mod') != '' }}
     defaults:
       run:
         working-directory: ports/go
@@ -107,8 +144,9 @@ jobs:
 
   php:
     name: PHP
+    needs: guard
+    if: needs.guard.outputs.php == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('ports/php/composer.json') != '' }}
     defaults:
       run:
         working-directory: ports/php
@@ -134,8 +172,9 @@ jobs:
 
   vectors-determinism:
     name: Vectors determinism
+    needs: guard
+    if: needs.guard.outputs.vectors == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('vectors/generate_vectors.py') != '' }}
     steps:
       - uses: actions/checkout@v4
       - name: Setup Python

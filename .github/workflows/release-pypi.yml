@@ -6,10 +6,22 @@ on:
       - "v*"
 
 jobs:
+  guard:
+    name: Manifest guard
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.check.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        if: ${{ hashFiles('ports/python/pyproject.toml') != '' }}
+        run: echo "exists=true" >> "$GITHUB_OUTPUT"
+
   publish:
     name: Publish Python package
+    needs: guard
+    if: needs.guard.outputs.ok == 'true'
     runs-on: ubuntu-latest
-    if: ${{ hashFiles('ports/python/pyproject.toml') != '' }}
     defaults:
       run:
         working-directory: ports/python
