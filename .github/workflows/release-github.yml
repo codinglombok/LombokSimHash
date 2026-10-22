@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: ports/typescript/package-lock.json
           registry-url: https://npm.pkg.github.com
@@ -62,8 +62,14 @@ jobs:
           fi
       - name: Scope package name for GitHub Packages
         run: node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync('package.json','utf8'));p.name='@codinglombok/lomboksimhash';fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n')"
-      - name: Publish to GitHub Packages
-        run: npm publish --access public
+      - name: Publish to GitHub Packages (skip if version already exists)
+        run: |
+          PKG_VER="$(node -p "require('./package.json').version")"
+          if npm view "@codinglombok/lomboksimhash@$PKG_VER" version >/dev/null 2>&1; then
+            echo "@codinglombok/lomboksimhash@$PKG_VER already exists on GitHub Packages - skipping publish (idempotent)"
+          else
+            npm publish --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -74,6 +80,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Set up Docker Buildx (docker-container driver — required for type=gha cache export)
+        uses: docker/setup-buildx-action@v3
       - name: Log in to ghcr.io
         uses: docker/login-action@v3
         with:
