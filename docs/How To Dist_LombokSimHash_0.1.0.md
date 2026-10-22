@@ -39,6 +39,7 @@ grep -m1 'version' ports/php/composer.json
 | Python | `cd ports/python && python3 -m build` | `dist/*.whl` + `dist/*.tar.gz` |
 | Go | `go build ./...` (module `ports/go`) | tidak ada artefak biner — sumber via module proxy |
 | PHP | tidak ada build | sumber via Packagist/git |
+| Container | `docker build -t ghcr.io/codinglombok/lomboksimhash .` | image statis musl `FROM scratch` (CLI) |
 
 ## 3. Smoke-test wajib SEBELUM publish
 
@@ -100,6 +101,28 @@ git tag ports/go/v0.1.0
 git push origin ports/go/v0.1.0
 ```
 Verifikasi: `go get github.com/codinglombok/LombokSimHash/ports/go@ports/go/v0.1.0`.
+
+### 4.6 GitHub Packages (mirror — otomatis saat GitHub Release di-publish)
+Trigger `release-github.yml`: event `release: published` (+ `workflow_dispatch`
+untuk re-run ter-target). `GITHUB_TOKEN` dengan `packages: write` — TANPA
+secret tambahan. Dua job:
+
+- **npm mirror** `@codinglombok/lomboksimhash` di `npm.pkg.github.com`.
+  Nama scoped di-rewrite saat CI (manifest tetap unscoped untuk npmjs.com).
+  Catatan install: GPR butuh token GitHub di `.npmrc` walau paket publik —
+  npmjs.com tetap primary. Pasang:
+  ```ini
+  @codinglombok:registry=https://npm.pkg.github.com/
+  //npm.pkg.github.com/:_authToken=<GH_PAT_read:packages>
+  ```
+- **Container** `ghcr.io/codinglombok/lomboksimhash` — tag `X.Y.Z`, `X.Y`,
+  `latest` (release) atau `main` (dispatch). Statis musl, `FROM scratch`:
+  `docker run ghcr.io/codinglombok/lomboksimhash:v0.1.0 simhash "the fox"`.
+  Setelah push PERTAMA: buka repo → Packages → `lomboksimhash` →
+  Package settings → **Change visibility → Public** (default awal private).
+
+Tidak berlaku: Maven/NuGet/RubyGems (tidak ada port Java/.NET/Ruby;
+NuGet masuk bersama port C# di milestone 0.2.0).
 
 ## 5. Verifikasi pasca-rilis
 

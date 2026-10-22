@@ -4,6 +4,9 @@
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/codinglombok/LombokSimHash/actions/workflows/ci.yml/badge.svg)](https://github.com/codinglombok/LombokSimHash/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/lomboksimhash)](https://www.npmjs.com/package/lomboksimhash)
+[![PyPI](https://img.shields.io/pypi/v/lomboksimhash)](https://pypi.org/project/lomboksimhash/)
+[![crates.io](https://img.shields.io/crates/v/lomboksimhash)](https://crates.io/crates/lomboksimhash)
 
 **LombokSimHash** is library #02 of [LombokRAGFrameworks](https://github.com/codinglombok/LombokRAGFrameworks) —
 a Tier 4 Hub in the Lombok Ecosystem. It identifies redundant documents *before* they
@@ -25,6 +28,22 @@ enter your vector store, preventing wasteful indexing of duplicate content.
 | Python | `pip install lomboksimhash` |
 | Go | `go get github.com/codinglombok/LombokSimHash/ports/go` |
 | PHP | `composer require codinglombok/lomboksimhash` |
+
+### Mirrors (GitHub Packages)
+
+Every tagged release is also published automatically to GitHub Packages:
+
+- **npm mirror** — `@codinglombok/lomboksimhash` on `npm.pkg.github.com`.
+  Installing from the mirror requires a GitHub token in `.npmrc` (a GitHub
+  Packages quirk — even public scoped packages need read auth), which is why
+  the npmjs.com package above stays primary.
+- **Container image** — `ghcr.io/codinglombok/lomboksimhash` (static musl
+  binary, `FROM scratch`, zero base layer). Pulls anonymously, no token:
+
+  ```bash
+  docker run ghcr.io/codinglombok/lomboksimhash:v0.1.0 simhash "the fox"
+  # 54b080184441c10c
+  ```
 
 ## What's inside
 
@@ -168,6 +187,9 @@ All ports fail closed with identical byte-for-byte messages:
 ## Documentation
 
 - [Changelog](changelog.md) — version history
+- [Contributing](CONTRIBUTING.md) — vectors-first workflow + per-port gates
+- [Security policy](SECURITY.md) — supported versions, reporting, scope
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 - [TypeScript port](ports/typescript/README.md) · [Python port](ports/python/README.md) · [Go port](ports/go/README.md) · [PHP port](ports/php/README.md)
 - Internal design docs (SPEC, Architecture, Masterplan, …) live in `docs/` per the
   Lombok Ecosystem documentation pack.

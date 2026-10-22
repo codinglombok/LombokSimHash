@@ -5,6 +5,33 @@ All notable changes to LombokSimHash will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **GitHub Packages publishing** — new `release-github.yml` workflow, triggered
+  automatically when a GitHub Release is published (plus `workflow_dispatch`
+  for targeted re-runs):
+  - npm mirror `@codinglombok/lomboksimhash` on `npm.pkg.github.com`
+    (scoped name applied at CI time; `GITHUB_TOKEN`, zero extra secrets)
+  - Container image `ghcr.io/codinglombok/lomboksimhash` — static musl
+    binary on `FROM scratch`, tags `vX.Y.Z` / `X.Y` / `latest`
+- `Dockerfile` + `.dockerignore` — two-stage build (`rust:1-alpine` → `scratch`)
+- Community health files: `CONTRIBUTING.md`, `SECURITY.md`,
+  `CODE_OF_CONDUCT.md`
+- Version badges (npm / PyPI / crates.io) and a Mirrors section in the README
+- `Cargo.lock` is now committed (binary crate + `cargo package --locked`
+  reproducibility); removed from `.gitignore`
+
+### Fixed
+- **Release to PyPI**: wheel smoke-test asserted the wrong constant —
+  `simhash64_text("the fox")` is `54b080184441c10c` (the previous `edee`
+  suffix belongs to the pangram `"the quick brown fox jumps over the lazy
+  dog"` = `cab7991c5475edee`). Assertion now pins the full canonical value
+- **CI**: PHP matrix dropped 8.1 (EOL; phpunit ^11.5 requires >= 8.2),
+  `composer.json` aligned to `>= 8.2`; workflow-validity startup failures
+  fixed by moving `hashFiles` out of job-level `if` into a guard job;
+  `actions/checkout` bumped v4 → v5
+
 ## [0.1.0] — 2026-10-21
 
 ### Added

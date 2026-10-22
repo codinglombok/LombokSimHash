@@ -1,0 +1,18 @@
+# Keep the build context minimal: only Cargo.toml, Cargo.lock and src/ are used.
+.git/
+.github/
+docs/
+target/
+**/target/
+node_modules/
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/.pytest_cache/
+**/.venv/
+coverage/
+ports/
+tests/
+vectors/
+*.log
+*.md
