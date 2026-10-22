@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:   # allows targeted re-release of PyPI without re-pushing the tag
 
 jobs:
   guard:
@@ -48,7 +49,7 @@ jobs:
         run: |
           python -m venv /tmp/lsh-smoke
           /tmp/lsh-smoke/bin/pip install --quiet dist/*.whl
-          /tmp/lsh-smoke/bin/python -c "from lomboksimhash import simhash64_text; assert f'{simhash64_text(chr(116)+chr(104)+chr(101)+chr(32)+chr(102)+chr(111)+chr(120)):016x}'.endswith('edee')"
+          /tmp/lsh-smoke/bin/python -c "from lomboksimhash import simhash64_text; v = f'{simhash64_text(chr(116)+chr(104)+chr(101)+chr(32)+chr(102)+chr(111)+chr(120)):016x}'; expected = '54b080184441c10c'; assert v == expected, 'smoke mismatch: got ' + v + ', expected ' + expected; print('smoke OK: simhash64_text(the fox) =', v)"
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
