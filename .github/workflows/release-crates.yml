@@ -12,7 +12,7 @@ jobs:
     outputs:
       ok: ${{ steps.check.outputs.exists }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: check
         if: ${{ hashFiles('Cargo.toml') != '' }}
         run: echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -23,7 +23,7 @@ jobs:
     if: needs.guard.outputs.ok == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:

@@ -18,7 +18,7 @@ jobs:
       php: ${{ steps.php.outputs.exists }}
       vectors: ${{ steps.vectors.outputs.exists }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: rust
         if: ${{ hashFiles('Cargo.toml') != '' }}
         run: echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -44,7 +44,7 @@ jobs:
     if: needs.guard.outputs.rust == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -75,7 +75,7 @@ jobs:
       run:
         working-directory: ports/typescript
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -103,7 +103,7 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -128,7 +128,7 @@ jobs:
       run:
         working-directory: ports/go
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -152,9 +152,9 @@ jobs:
         working-directory: ports/php
     strategy:
       matrix:
-        php-version: ["8.1", "8.2", "8.3"]
+        php-version: ["8.2", "8.3"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -176,7 +176,7 @@ jobs:
     if: needs.guard.outputs.vectors == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Python
         uses: actions/setup-python@v5
         with:

@@ -12,7 +12,7 @@ jobs:
     outputs:
       ok: ${{ steps.check.outputs.exists }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: check
         if: ${{ hashFiles('ports/python/pyproject.toml') != '' }}
         run: echo "exists=true" >> "$GITHUB_OUTPUT"
@@ -28,7 +28,7 @@ jobs:
     permissions:
       id-token: write   # for PyPI trusted publishing (OIDC)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
