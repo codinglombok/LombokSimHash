@@ -1,0 +1,56 @@
+{
+  "name": "lomboksimhash",
+  "version": "0.1.0",
+  "description": "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling.",
+  "type": "module",
+  "main": "dist/cjs/index.cjs",
+  "types": "dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/esm/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node scripts/postbuild.mjs",
+    "typecheck": "tsc -p tsconfig.esm.json --noEmit",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest --coverage",
+    "crosscheck": "node --import tsx src/crosscheck.ts",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "simhash",
+    "minhash",
+    "lsh",
+    "deduplication",
+    "hashing",
+    "locality-sensitive-hashing",
+    "near-duplicate",
+    "lombok"
+  ],
+  "author": "CodingLombok <codinglombok@gmail.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codinglombok/LombokSimHash.git",
+    "directory": "ports/typescript"
+  },
+  "homepage": "https://github.com/codinglombok/LombokSimHash",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.9",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
