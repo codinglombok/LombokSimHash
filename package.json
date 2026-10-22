@@ -1,6 +1,10 @@
 {
   "name": "lomboksimhash",
   "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "ports/typescript"
+  ],
   "description": "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling.",
   "type": "module",
   "main": "dist/cjs/index.cjs",
