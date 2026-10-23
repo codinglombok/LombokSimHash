@@ -38,6 +38,24 @@ jobs:
         if: ${{ hashFiles('vectors/generate_vectors.py') != '' }}
         run: echo "exists=true" >> "$GITHUB_OUTPUT"
 
+  docs-guard:
+    name: Internal docs stay untracked
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Fail if internal design docs are tracked
+        run: |
+          # Dokumen desain internal (arsip lokal) tidak boleh ikut repo publik.
+          # Jika suatu saat salah satu ingin dipublikasi, keluarkan dari daftar ini
+          # DAN dari blok ignore di .gitignore secara sadar (per file).
+          LEAKED="$(git ls-files 'docs/*' | grep -Ei '(Masterplan_|^docs/Map_|SPEC_|Architecture_|TECH DEBT_|Stucture Repo_)' || true)"
+          if [ -n "$LEAKED" ]; then
+            echo "Internal design docs must stay untracked (gitignored, local archive only):" >&2
+            echo "$LEAKED" >&2
+            exit 1
+          fi
+          echo "OK - no internal design docs tracked"
+
   rust:
     name: Rust (core)
     needs: guard
