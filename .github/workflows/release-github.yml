@@ -30,6 +30,7 @@ jobs:
     needs: guard
     if: needs.guard.outputs.typescript == 'true'
     runs-on: ubuntu-latest
+    environment: npm
     defaults:
       run:
         working-directory: ports/typescript
@@ -78,6 +79,7 @@ jobs:
     needs: guard
     if: needs.guard.outputs.rust == 'true'
     runs-on: ubuntu-latest
+    environment: docker
     steps:
       - uses: actions/checkout@v5
       - name: Set up Docker Buildx (docker-container driver — required for type=gha cache export)

@@ -1,0 +1,37 @@
+{
+    "name": "codinglombok/lomboksimhash",
+    "description": "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling with identical results in PHP, TypeScript, Rust, Python and Go. Requires ext-gmp and ext-mbstring.",
+    "type": "library",
+    "license": "Apache-2.0",
+    "keywords": [
+        "simhash",
+        "minhash",
+        "lsh",
+        "deduplication",
+        "hashing",
+        "locality-sensitive-hashing",
+        "near-duplicate",
+        "lombok"
+    ],
+    "require": {
+        "php": ">=8.2",
+        "ext-gmp": "*",
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "CodingLombok\\LombokSimHash\\": "ports/php/src/"
+        }
+    },
+    "scripts": {
+        "test": "cd ports/php && composer install --quiet --no-interaction && vendor/bin/phpunit",
+        "phpstan": "cd ports/php && composer install --quiet --no-interaction && vendor/bin/phpstan analyse --no-progress"
+    },
+    "homepage": "https://github.com/codinglombok/LombokSimHash",
+    "authors": [
+        {
+            "name": "CodingLombok",
+            "email": "codinglombok@gmail.com"
+        }
+    ]
+}

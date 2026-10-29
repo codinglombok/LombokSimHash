@@ -22,6 +22,7 @@ jobs:
     needs: guard
     if: needs.guard.outputs.ok == 'true'
     runs-on: ubuntu-latest
+    environment: crates
     steps:
       - uses: actions/checkout@v5
       - name: Install Rust

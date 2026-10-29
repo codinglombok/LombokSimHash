@@ -23,6 +23,7 @@ jobs:
     needs: guard
     if: needs.guard.outputs.ok == 'true'
     runs-on: ubuntu-latest
+    environment: pypi
     defaults:
       run:
         working-directory: ports/python
