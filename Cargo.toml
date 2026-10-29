@@ -1,6 +1,6 @@
 [package]
 name = "lomboksimhash"
-version = "0.1.0"
+version = "0.1.2"
 edition = "2021"
 authors = ["CodingLombok <codinglombok@gmail.com>"]
 description = "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling."

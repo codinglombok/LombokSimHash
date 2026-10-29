@@ -7,7 +7,14 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+_(nothing)_
+
+## [0.1.2] — 2026-10-29
+
 ### Added
+- Root `composer.json` — Packagist distribution as `codinglombok/lomboksimhash`
+  (PSR-4 autoload `CodingLombok\LombokSimHash\` -> `ports/php/src/`;
+  `ports/php/composer.json` kept as the dev harness)
 - **GitHub Packages publishing** — new `release-github.yml` workflow, triggered
   automatically when a GitHub Release is published (plus `workflow_dispatch`
   for targeted re-runs):
@@ -21,6 +28,11 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Version badges (npm / PyPI / crates.io) and a Mirrors section in the README
 - `Cargo.lock` is now committed (binary crate + `cargo package --locked`
   reproducibility); removed from `.gitignore`
+
+### Changed
+- Release workflows declare GitHub deployment environments — `crates`, `npm`,
+  `pypi` on the registry publish jobs, `npm` on the GPR mirror and `docker` on
+  the ghcr.io job — so every publish records a Deployment (Masterplan v3.7 R1)
 
 ### Fixed
 - **Release to PyPI**: wheel smoke-test asserted the wrong constant —
@@ -115,4 +127,5 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - All hash values verified bit-identical across Rust, TypeScript, Python, Go, PHP
   against the shared vector file
 
+[0.1.2]: https://github.com/codinglombok/LombokSimHash/releases/tag/v0.1.2
 [0.1.0]: https://github.com/codinglombok/LombokSimHash/releases/tag/v0.1.0

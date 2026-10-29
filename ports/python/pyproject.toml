@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lomboksimhash"
-version = "0.1.0"
+version = "0.1.2"
 description = "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling."
 readme = "README.md"
 requires-python = ">=3.10"

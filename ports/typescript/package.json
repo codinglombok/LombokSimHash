@@ -1,6 +1,6 @@
 {
   "name": "lomboksimhash",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Locality-sensitive hashing for near-duplicate document detection. SimHash, MinHash, LSH, SHA-256, and shingling.",
   "type": "module",
   "main": "dist/cjs/index.cjs",
